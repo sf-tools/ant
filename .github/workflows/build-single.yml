@@ -1,0 +1,81 @@
+name: Build Single Platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Target platform'
+        required: true
+        type: choice
+        options:
+          - linux-glibc-x64
+          - linux-glibc-aarch64
+          - linux-musl-x64
+          - linux-musl-aarch64
+          - macos-x64
+          - macos-aarch64
+          - windows-x64
+      ref:
+        description: 'themackabu/ant ref (branch, tag, or sha)'
+        required: false
+        default: 'main'
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: depot-ubuntu-24.04
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.value }}
+      runner: ${{ steps.map.outputs.runner }}
+      container: ${{ steps.map.outputs.container }}
+      family: ${{ steps.map.outputs.family }}
+      shell: ${{ steps.map.outputs.shell }}
+    steps:
+      - id: timestamp
+        run: echo "value=$(date +%s)" >> "$GITHUB_OUTPUT"
+      - id: map
+        run: |
+          case "${{ inputs.platform }}" in
+            linux-glibc-x64)     RUNNER=depot-ubuntu-24.04;     CONTAINER=ubuntu:22.04; FAMILY=linux-glibc; SHELL_=bash ;;
+            linux-glibc-aarch64) RUNNER=depot-ubuntu-24.04-arm; CONTAINER=ubuntu:22.04; FAMILY=linux-glibc; SHELL_=bash ;;
+            linux-musl-x64)      RUNNER=depot-ubuntu-24.04;     CONTAINER=alpine:3.23;  FAMILY=linux-musl;  SHELL_=sh ;;
+            linux-musl-aarch64)  RUNNER=depot-ubuntu-24.04-arm; CONTAINER=alpine:3.23;  FAMILY=linux-musl;  SHELL_=sh ;;
+            macos-x64)           RUNNER=depot-macos-15;         CONTAINER='';           FAMILY=macos;       SHELL_=bash ;;
+            macos-aarch64)       RUNNER=depot-macos-15;         CONTAINER='';           FAMILY=macos;       SHELL_=bash ;;
+            windows-x64)         RUNNER=depot-windows-2025;     CONTAINER='';           FAMILY=windows;     SHELL_='msys2 {0}' ;;
+            *) echo "Unknown platform: ${{ inputs.platform }}" >&2; exit 1 ;;
+          esac
+          {
+            echo "runner=$RUNNER"
+            echo "container=$CONTAINER"
+            echo "family=$FAMILY"
+            echo "shell=$SHELL_"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prepare
+    uses: ./.github/workflows/build-platform.yml
+    with:
+      ref: ${{ inputs.ref }}
+      platform: ${{ inputs.platform }}
+      runner: ${{ needs.prepare.outputs.runner }}
+      container: ${{ needs.prepare.outputs.container }}
+      family: ${{ needs.prepare.outputs.family }}
+      shell: ${{ needs.prepare.outputs.shell }}
+      build_timestamp: ${{ needs.prepare.outputs.timestamp }}
+
+  nanos:
+    needs: [build]
+    if: ${{ inputs.platform == 'linux-musl-x64' || inputs.platform == 'linux-musl-aarch64' }}
+    uses: ./.github/workflows/build-nanos.yml
+    with:
+      ref: ${{ inputs.ref }}
+      arch: ${{ inputs.platform == 'linux-musl-aarch64' && 'aarch64' || 'x64' }}
+      artifact: ${{ inputs.platform == 'linux-musl-aarch64' && 'ant-linux-aarch64-musl' || 'ant-linux-x64-musl' }}
+      runner: ${{ inputs.platform == 'linux-musl-aarch64' && 'depot-ubuntu-24.04-arm' || 'depot-ubuntu-24.04' }}
+      image: ${{ inputs.platform == 'linux-musl-aarch64' && 'ant-sandbox-aarch64' || 'ant-sandbox-x64' }}
