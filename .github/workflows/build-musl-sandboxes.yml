@@ -6,7 +6,7 @@ on:
       ref:
         description: 'themackabu/ant ref (branch, tag, or sha)'
         required: false
-        default: 'main'
+        default: 'master'
         type: string
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: build-musl-sandboxes-${{ inputs.ref || 'main' }}
+  group: build-musl-sandboxes-${{ inputs.ref || 'master' }}
   cancel-in-progress: false
 
 jobs:

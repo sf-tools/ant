@@ -41,7 +41,7 @@ on:
       ref:
         description: 'themackabu/ant ref (branch, tag, or sha)'
         required: false
-        default: 'main'
+        default: 'master'
         type: string
       arch:
         description: 'Target architecture'

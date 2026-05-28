@@ -6,7 +6,7 @@ on:
       ref:
         description: 'themackabu/ant ref (branch, tag, or sha)'
         required: false
-        default: 'main'
+        default: 'master'
         type: string
 
 permissions:
@@ -14,11 +14,11 @@ permissions:
   actions: read
 
 concurrency:
-  group: build-${{ inputs.ref || 'main' }}
+  group: build-${{ inputs.ref || 'master' }}
   cancel-in-progress: false
 
 env:
-  UPSTREAM_REF: ${{ inputs.ref || 'main' }}
+  UPSTREAM_REF: ${{ inputs.ref || 'master' }}
 
 jobs:
   prepare:
