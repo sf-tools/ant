@@ -1,4 +1,4 @@
-# sf-tools/ant — CI mirror
+# 🐜 CI mirror
 
 CI-only mirror for **[themackabu/ant](https://github.com/themackabu/ant)**.
 

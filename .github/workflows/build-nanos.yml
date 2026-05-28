@@ -320,3 +320,14 @@ jobs:
             packages/sandbox/ant-sandbox-${{ inputs.arch }}.img
             packages/sandbox/ant-kernel-${{ inputs.arch }}.img
           retention-days: 7
+
+      - name: Refresh manifest
+        env:
+          MANIFEST_REFRESH_TOKEN: ${{ secrets.MANIFEST_REFRESH_TOKEN }}
+          UPSTREAM_BRANCH: ${{ inputs.ref }}
+        if: ${{ env.MANIFEST_REFRESH_TOKEN != '' }}
+        run: |
+          curl -fsS -X POST -G https://manifest.antjs.org/v1/refresh \
+            --data-urlencode "branch=${UPSTREAM_BRANCH}" \
+            --data-urlencode "run_id=${GITHUB_RUN_ID}" \
+            -H "Authorization: Bearer ${MANIFEST_REFRESH_TOKEN}"

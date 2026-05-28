@@ -139,3 +139,20 @@ jobs:
           echo "## Build Version: \`${UNIQUE[0]}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Upstream: \`themackabu/ant@${{ needs.prepare.outputs.ref }}\`" >> $GITHUB_STEP_SUMMARY
+
+  refresh-manifest:
+    name: Refresh manifest
+    needs: [prepare, build, nanos-x64, nanos-aarch64]
+    runs-on: ubuntu-latest
+    if: ${{ always() && !cancelled() && (needs.build.result == 'success' || needs.nanos-x64.result == 'success' || needs.nanos-aarch64.result == 'success') }}
+    steps:
+      - name: Refresh manifest
+        env:
+          MANIFEST_REFRESH_TOKEN: ${{ secrets.MANIFEST_REFRESH_TOKEN }}
+          UPSTREAM_BRANCH: ${{ needs.prepare.outputs.ref }}
+        if: ${{ env.MANIFEST_REFRESH_TOKEN != '' }}
+        run: |
+          curl -fsS -X POST -G https://manifest.antjs.org/v1/refresh \
+            --data-urlencode "branch=${UPSTREAM_BRANCH}" \
+            --data-urlencode "run_id=${GITHUB_RUN_ID}" \
+            -H "Authorization: Bearer ${MANIFEST_REFRESH_TOKEN}"
