@@ -20,7 +20,7 @@ concurrency:
 jobs:
   prepare:
     name: Prepare
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     outputs:
       timestamp: ${{ steps.timestamp.outputs.value }}
     steps:
@@ -34,12 +34,12 @@ jobs:
       matrix:
         include:
           - platform: linux-musl-x64
-            runner: depot-ubuntu-24.04
+            runner: blacksmith-8vcpu-ubuntu-2404
             container: alpine:3.23
             family: linux-musl
             shell: sh
           - platform: linux-musl-aarch64
-            runner: depot-ubuntu-24.04-arm
+            runner: blacksmith-8vcpu-ubuntu-2404-arm
             container: alpine:3.23
             family: linux-musl
             shell: sh
@@ -61,7 +61,7 @@ jobs:
       ref: ${{ inputs.ref }}
       arch: x64
       artifact: ant-linux-x64-musl
-      runner: depot-ubuntu-24.04
+      runner: blacksmith-8vcpu-ubuntu-2404
       image: ant-sandbox-x64
       source_run_id: ${{ github.run_id }}
 
@@ -73,12 +73,12 @@ jobs:
       ref: ${{ inputs.ref }}
       arch: aarch64
       artifact: ant-linux-aarch64-musl
-      runner: depot-ubuntu-24.04-arm
+      runner: blacksmith-8vcpu-ubuntu-2404-arm
       image: ant-sandbox-aarch64
       source_run_id: ${{ github.run_id }}
 
   summary:
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     needs: [build-musl, sandbox-x64, sandbox-aarch64]
     if: ${{ always() && !cancelled() }}
     steps:

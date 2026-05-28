@@ -28,7 +28,7 @@ permissions:
 jobs:
   prepare:
     name: Prepare
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     outputs:
       timestamp: ${{ steps.timestamp.outputs.value }}
       runner: ${{ steps.map.outputs.runner }}
@@ -41,13 +41,13 @@ jobs:
       - id: map
         run: |
           case "${{ inputs.platform }}" in
-            linux-glibc-x64)     RUNNER=depot-ubuntu-24.04;     CONTAINER=ubuntu:22.04; FAMILY=linux-glibc; SHELL_=bash ;;
-            linux-glibc-aarch64) RUNNER=depot-ubuntu-24.04-arm; CONTAINER=ubuntu:22.04; FAMILY=linux-glibc; SHELL_=bash ;;
-            linux-musl-x64)      RUNNER=depot-ubuntu-24.04;     CONTAINER=alpine:3.23;  FAMILY=linux-musl;  SHELL_=sh ;;
-            linux-musl-aarch64)  RUNNER=depot-ubuntu-24.04-arm; CONTAINER=alpine:3.23;  FAMILY=linux-musl;  SHELL_=sh ;;
-            macos-x64)           RUNNER=depot-macos-15;         CONTAINER='';           FAMILY=macos;       SHELL_=bash ;;
-            macos-aarch64)       RUNNER=depot-macos-15;         CONTAINER='';           FAMILY=macos;       SHELL_=bash ;;
-            windows-x64)         RUNNER=depot-windows-2025;     CONTAINER='';           FAMILY=windows;     SHELL_='msys2 {0}' ;;
+            linux-glibc-x64)     RUNNER=blacksmith-8vcpu-ubuntu-2404;     CONTAINER=ubuntu:22.04; FAMILY=linux-glibc; SHELL_=bash ;;
+            linux-glibc-aarch64) RUNNER=blacksmith-8vcpu-ubuntu-2404-arm; CONTAINER=ubuntu:22.04; FAMILY=linux-glibc; SHELL_=bash ;;
+            linux-musl-x64)      RUNNER=blacksmith-8vcpu-ubuntu-2404;     CONTAINER=alpine:3.23;  FAMILY=linux-musl;  SHELL_=sh ;;
+            linux-musl-aarch64)  RUNNER=blacksmith-8vcpu-ubuntu-2404-arm; CONTAINER=alpine:3.23;  FAMILY=linux-musl;  SHELL_=sh ;;
+            macos-x64)           RUNNER=blacksmith-12vcpu-macos-15;         CONTAINER='';           FAMILY=macos;       SHELL_=bash ;;
+            macos-aarch64)       RUNNER=blacksmith-12vcpu-macos-15;         CONTAINER='';           FAMILY=macos;       SHELL_=bash ;;
+            windows-x64)         RUNNER=blacksmith-8vcpu-windows-2025;     CONTAINER='';           FAMILY=windows;     SHELL_='msys2 {0}' ;;
             *) echo "Unknown platform: ${{ inputs.platform }}" >&2; exit 1 ;;
           esac
           {
@@ -77,5 +77,5 @@ jobs:
       ref: ${{ inputs.ref }}
       arch: ${{ inputs.platform == 'linux-musl-aarch64' && 'aarch64' || 'x64' }}
       artifact: ${{ inputs.platform == 'linux-musl-aarch64' && 'ant-linux-aarch64-musl' || 'ant-linux-x64-musl' }}
-      runner: ${{ inputs.platform == 'linux-musl-aarch64' && 'depot-ubuntu-24.04-arm' || 'depot-ubuntu-24.04' }}
+      runner: ${{ inputs.platform == 'linux-musl-aarch64' && 'blacksmith-8vcpu-ubuntu-2404-arm' || 'blacksmith-8vcpu-ubuntu-2404' }}
       image: ${{ inputs.platform == 'linux-musl-aarch64' && 'ant-sandbox-aarch64' || 'ant-sandbox-x64' }}

@@ -82,7 +82,7 @@ env:
 jobs:
   nanos:
     name: Nanos Image (${{ inputs.arch }})
-    runs-on: ${{ inputs.runner || (inputs.arch == 'aarch64' && 'depot-ubuntu-24.04-arm' || 'depot-ubuntu-24.04') }}
+    runs-on: ${{ inputs.runner || (inputs.arch == 'aarch64' && 'blacksmith-8vcpu-ubuntu-2404-arm' || 'blacksmith-8vcpu-ubuntu-2404') }}
     env:
       NANOS_ARTIFACT: ${{ inputs.artifact || (inputs.arch == 'aarch64' && 'ant-linux-aarch64-musl' || 'ant-linux-x64-musl') }}
       NANOS_IMAGE: ${{ inputs.image || (inputs.arch == 'aarch64' && 'ant-sandbox-aarch64' || 'ant-sandbox-x64') }}

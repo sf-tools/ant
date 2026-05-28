@@ -23,7 +23,7 @@ env:
 jobs:
   prepare:
     name: Prepare
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     outputs:
       timestamp: ${{ steps.timestamp.outputs.value }}
       ref: ${{ env.UPSTREAM_REF }}
@@ -40,37 +40,37 @@ jobs:
       matrix:
         include:
           - platform: linux-glibc-x64
-            runner: depot-ubuntu-24.04
+            runner: blacksmith-8vcpu-ubuntu-2404
             container: ubuntu:22.04
             family: linux-glibc
             shell: bash
           - platform: linux-glibc-aarch64
-            runner: depot-ubuntu-24.04-arm
+            runner: blacksmith-8vcpu-ubuntu-2404-arm
             container: ubuntu:22.04
             family: linux-glibc
             shell: bash
           - platform: linux-musl-x64
-            runner: depot-ubuntu-24.04
+            runner: blacksmith-8vcpu-ubuntu-2404
             container: alpine:3.23
             family: linux-musl
             shell: sh
           - platform: linux-musl-aarch64
-            runner: depot-ubuntu-24.04-arm
+            runner: blacksmith-8vcpu-ubuntu-2404-arm
             container: alpine:3.23
             family: linux-musl
             shell: sh
           - platform: macos-x64
-            runner: depot-macos-15
+            runner: blacksmith-12vcpu-macos-15
             container: ''
             family: macos
             shell: bash
           - platform: macos-aarch64
-            runner: depot-macos-15
+            runner: blacksmith-12vcpu-macos-15
             container: ''
             family: macos
             shell: bash
           - platform: windows-x64
-            runner: depot-windows-2025
+            runner: blacksmith-8vcpu-windows-2025
             container: ''
             family: windows
             shell: 'msys2 {0}'
@@ -92,7 +92,7 @@ jobs:
       ref: ${{ needs.prepare.outputs.ref }}
       arch: x64
       artifact: ant-linux-x64-musl
-      runner: depot-ubuntu-24.04
+      runner: blacksmith-8vcpu-ubuntu-2404
       image: ant-sandbox-x64
 
   nanos-aarch64:
@@ -103,13 +103,13 @@ jobs:
       ref: ${{ needs.prepare.outputs.ref }}
       arch: aarch64
       artifact: ant-linux-aarch64-musl
-      runner: depot-ubuntu-24.04-arm
+      runner: blacksmith-8vcpu-ubuntu-2404-arm
       image: ant-sandbox-aarch64
 
   summary:
     name: Version
     needs: [prepare, build]
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     if: ${{ !cancelled() && needs.build.result != 'skipped' }}
     steps:
       - name: Download version artifacts
