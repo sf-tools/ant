@@ -54,12 +54,10 @@ jobs:
     outputs:
       version: ${{ steps.build.outputs.version }}
     steps:
-      # === ALPINE ARM64 WORKAROUND (must be first) ===
       - name: Setup Alpine ARM64 support
         if: inputs.platform == 'linux-musl-aarch64'
         uses: laverdet/alpine-arm64@v1
 
-      # === LINUX GLIBC SETUP ===
       - name: Setup Linux glibc environment
         if: inputs.family == 'linux-glibc'
         shell: bash
@@ -80,7 +78,6 @@ jobs:
           pip3 install meson tomli
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      # === LINUX MUSL SETUP ===
       - name: Setup Linux musl environment
         if: inputs.family == 'linux-musl'
         shell: sh
@@ -91,7 +88,6 @@ jobs:
             py3-tomli tar xz zstd jq bash
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      # === MACOS SETUP ===
       - name: Setup macOS environment
         if: inputs.family == 'macos'
         shell: bash
@@ -99,12 +95,6 @@ jobs:
           for pkg in meson ninja llvm jq; do
             brew list "$pkg" &>/dev/null || brew install "$pkg"
           done
-
-      # === WINDOWS SETUP ===
-      - name: Disable Windows Defender real-time monitoring
-        if: inputs.family == 'windows'
-        shell: pwsh
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
 
       - name: Setup Windows MSYS2
         if: inputs.family == 'windows'
@@ -122,7 +112,6 @@ jobs:
         shell: bash
         run: git config --global core.autocrlf false
 
-      # === CHECKOUT UPSTREAM ===
       - name: Checkout ${{ env.UPSTREAM_REPO }}@${{ inputs.ref }}
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
@@ -130,7 +119,6 @@ jobs:
           ref: ${{ inputs.ref }}
           submodules: recursive
 
-      # === LOAD TARGET CONFIG ===
       - name: Load target configuration
         id: config
         shell: bash
@@ -159,13 +147,11 @@ jobs:
 
           echo "zlib_version=$(echo $DEPS | jq -r '.zlib')" >> $GITHUB_OUTPUT
 
-      # === SETUP ZIG ===
       - name: Setup Zig
         uses: ./.github/actions/setup-zig
         with:
           version: ${{ steps.config.outputs.zig_version }}
 
-      # === SETUP LLVM ===
       - name: Setup LLVM
         id: llvm
         uses: ./.github/actions/setup-llvm
@@ -173,7 +159,6 @@ jobs:
           version: ${{ steps.config.outputs.llvm_version }}
           os_type: ${{ steps.config.outputs.os_type }}
 
-      # === BUILD NATIVE DEPS ===
       - name: Build native dependencies
         uses: ./.github/actions/build-native-deps
         with:
@@ -186,7 +171,6 @@ jobs:
           cmake_generator: ${{ steps.config.outputs.cmake_generator }}
           zlib_version: ${{ steps.config.outputs.zlib_version }}
 
-      # === BUILD PROJECT ===
       - name: Build project
         id: build
         uses: ./.github/actions/build-project
@@ -203,7 +187,6 @@ jobs:
           extra_meson_args: ${{ steps.config.outputs.extra_meson_args }}
           binary_name: ${{ steps.config.outputs.binary_name }}
 
-      # === UPLOAD ARTIFACTS ===
       - name: Upload binary
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
