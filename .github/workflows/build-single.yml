@@ -28,7 +28,7 @@ permissions:
 jobs:
   prepare:
     name: Prepare
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     outputs:
       timestamp: ${{ steps.timestamp.outputs.value }}
       runner: ${{ steps.map.outputs.runner }}

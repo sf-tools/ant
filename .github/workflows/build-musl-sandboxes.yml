@@ -20,7 +20,7 @@ concurrency:
 jobs:
   prepare:
     name: Prepare
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     outputs:
       timestamp: ${{ steps.timestamp.outputs.value }}
     steps:
@@ -78,7 +78,7 @@ jobs:
       source_run_id: ${{ github.run_id }}
 
   summary:
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     needs: [build-musl, sandbox-x64, sandbox-aarch64]
     if: ${{ always() && !cancelled() }}
     steps:
