@@ -23,7 +23,7 @@ env:
 jobs:
   prepare:
     name: Prepare
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     outputs:
       timestamp: ${{ steps.timestamp.outputs.value }}
       ref: ${{ env.UPSTREAM_REF }}
@@ -109,7 +109,7 @@ jobs:
   summary:
     name: Version
     needs: [prepare, build]
-    runs-on: depot-ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ !cancelled() && needs.build.result != 'skipped' }}
     steps:
       - name: Download version artifacts
